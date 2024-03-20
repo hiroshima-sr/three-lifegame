@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+
+    <link href="./css/materialize.min.css" rel="stylesheet" />
+    <link href="./css/style.scss" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container center-align">
+      <div class="col s12 section"><canvas id="myCanvas"></canvas></div>
+      <ul class="collection col s12">
+        <li class="collection-item">
+          <div class="container">
+            <div class="row">
+              <span class="col s5">
+                <span class="switch">
+                  <label>
+                    <span>stop</span>
+                    <input id="play" type="checkbox" />
+                    <span class="lever"></span>
+                    <span>play</span>
+                  </label>
+                </span>
+              </span>
+              <span class="col s1"></span>
+              <span class="col s5">
+                <a
+                  class="btn-small outlined waves-effect waves-light"
+                  id="next"
+                  type="button"
+                >
+                  <svg
+                    class="octicon"
+                    xmlns="http://www.w3.org/2000/svg"
+                    enable-background="new 0 0 24 24"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    width="13"
+                  >
+                    <g><path d="M0,0h24v24H0V0z" fill="none" /></g>
+                    <g>
+                      <polygon
+                        points="6.23,20.23 8,22 18,12 8,2 6.23,3.77 14.46,12"
+                      />
+                    </g>
+                  </svg>
+                  <span>next</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </li>
+        <li class="collection-item">
+          <p class="range-field left-align">
+            <span>X</span>
+            <input
+              id="rangex"
+              type="range"
+              name="rangex"
+              min="10"
+              max="50"
+              value="50"
+            />
+          </p>
+
+          <p class="range-field left-align">
+            <span>Y</span>
+            <input
+              id="rangey"
+              type="range"
+              name="rangey"
+              min="10"
+              max="50"
+              value="50"
+            />
+          </p>
+        </li>
+        <li class="collection-item">
+          <p class="range-field left-align">
+            <span>履歴</span>
+            <input
+              id="history"
+              type="range"
+              name="rangey"
+              min="0"
+              max="0"
+              value="0"
+            />
+          </p>
+        </li>
+      </ul>
+    </div>
+    <script type="module" src="./js/tree.js"></script>
+    <script type="module" src="./js/main.js"></script>
+    <script type="module" src="./js/materialize.min.js"></script>
+  </body>
+</html>

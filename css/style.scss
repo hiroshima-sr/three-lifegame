@@ -1,0 +1,13 @@
+//<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 10px; /* バーの高さ */
+  background: #8acdff; /* バーの背景色 */
+  border-radius: 4px; /* バーの両端の丸み */
+  border: solid 2px #bae1ff; /* バー周囲の線 */
+}
+
+body {
+  background: rgb(252, 250, 242);
+}
