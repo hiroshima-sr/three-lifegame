@@ -23,24 +23,15 @@ export class Three {
 
     this.scene.add(this.camera);
     this.camera.position.set(0, 180, 150);
-    //controls.autoRotate = true;
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.1;
-    const axesHelper = new THREE.AxesHelper(2);
+    const axesHelper = new THREE.AxesHelper(1);
     this.scene.add(axesHelper);
 
     const light = new THREE.DirectionalLight(0xffffff);
     light.intensity = 10;
     light.position.set(1, 1, 1);
     this.scene.add(light);
-
-    const radian = THREE.MathUtils.degToRad(360 / 360 ** 10);
-    const vecA = new THREE.Vector2(0, 0);
-    const vecB = new THREE.Vector2(1, 0);
-    const vecX = vecB.clone().rotateAround(vecA, radian);
-    const dis = (vecB.distanceTo(vecX) * 360 ** 10) / 2;
-    console.log(dis);
-    console.log(Math.PI === dis);
   }
 
   createGridMap = (gridSizeX, gridSizeY) => {
@@ -61,23 +52,23 @@ export class Three {
     );
     const material = new THREE.MeshBasicMaterial({
       blending: THREE.AdditiveBlending,
-      depthWrite: false, // 深度を更新させないことで、裏側との合成ができる
+      depthWrite: false,
     });
-    //idは0からの連番。
+
     this.mesh = new THREE.InstancedMesh(geometry, material, 50 * 51);
 
     this.scene.add(this.mesh);
 
+    //idは0からの連番。
     let count = 0;
     for (let i = 0; i < this.gridSizeX; i++) {
       for (let j = 0; j < this.gridSizeY; j++) {
-        const color = new THREE.Color(0x010203);
+        const color = new THREE.Color(0x131415);
 
         const cellMatrix = this.createMatrix4(i, 0, j);
         const gridMatrix = this.createMatrix4(i, 0, j);
         const id = count;
         this.mesh.setMatrixAt(id, cellMatrix);
-        // gridMesh.setMatrixAt(id, gridMatrix);
         this.mesh.setColorAt(id, color);
         this.mesh.instanceColor.needsUpdate = true;
         this.mesh.instanceMatrix.needsUpdate = true;
@@ -85,7 +76,6 @@ export class Three {
         line.applyMatrix4(gridMatrix);
         line.rotation.x = -Math.PI / 2;
         this.wrap.add(line);
-        // this.scene.add(line);
         count++;
       }
     }
@@ -96,7 +86,7 @@ export class Three {
     const matrix = new THREE.Matrix4();
     const boxInterval = 10;
     const offsetX = (this.boxSize * this.gridSizeX) / 2 - boxInterval / 2;
-    const offsetZ = (this.boxSize * this.gridSizeY) / 2 - boxInterval / 2; //3次元所なためYをZに
+    const offsetZ = (this.boxSize * this.gridSizeY) / 2 - boxInterval / 2; //3次元上に2次元盤面を描画するため、YをZに
     matrix.setPosition(10 * x - offsetX, y, 10 * z - offsetZ);
     return matrix;
   };
@@ -114,14 +104,13 @@ export class Three {
   pointerHitObject = (x, y, width, height) => {
     this.mouse.x = (x / width) * 2 - 1;
     this.mouse.y = -(y / height) * 2 + 1;
-    // console.log(`x:${this.mouse.x},y:${this.mouse.y}`);
   };
 
   getRaycastTarget = () => {
     const intersects = this.raycasterTarget();
     if (intersects.length > 0) {
       console.log(intersects);
-      //エディタでの型表示のため。idがundefinedでの0になることは無い。
+      //エディタでの型推論のため。idがundefinedになることは無い。
       const id = intersects[0].instanceId ?? 0;
       return { found: true, id: id };
     }
@@ -138,7 +127,7 @@ export class Three {
         for (let j = 0; j < this.gridSizeY; j++) {
           const tt = board[i][j];
           const color = tt?.alive
-            ? new THREE.Color(0x111223)
+            ? new THREE.Color(0x222334)
             : new THREE.Color(0x000000);
 
           const matrix = this.createMatrix4(i, 0, j);
@@ -162,7 +151,19 @@ export class Three {
     }
   };
 
-  gridResize = () => {
+  onResize = (windowWidth) => {
+    // レンダラーのサイズを調整する
+    const canvasWidth = windowWidth * 0.95;
+    const width = canvasWidth <= 800 ? canvasWidth : 800;
+    const height = (width / 16) * 9;
+    this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    this.renderer.setSize(width, height);
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+  };
+
+  onGridResize = () => {
     const gridGeometry = new THREE.PlaneGeometry(this.boxSize, this.boxSize);
     const edgesGeometry = new THREE.EdgesGeometry(gridGeometry);
     const lineMaterial = new THREE.LineBasicMaterial({
@@ -183,11 +184,11 @@ export class Three {
     }
   };
 
-  treeUpdate = () => {
+  threeUpdate = () => {
     const intersects = this.raycasterTarget();
     if (intersects.length > 0) {
       const id = intersects[0].instanceId;
-      const color = new THREE.Color(0x211223);
+      const color = new THREE.Color(0x281828);
       this.mesh.setColorAt(id, color);
     }
     this.controls.update();

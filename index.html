@@ -8,88 +8,204 @@
   </head>
   <body>
     <div class="container center-align">
-      <div class="col s12 section"><canvas id="myCanvas"></canvas></div>
-      <ul class="collection col s12">
-        <li class="collection-item">
-          <div class="container">
-            <div class="row">
-              <span class="col s5">
-                <span class="switch">
-                  <label>
-                    <span>stop</span>
-                    <input id="play" type="checkbox" />
-                    <span class="lever"></span>
-                    <span>play</span>
-                  </label>
-                </span>
-              </span>
-              <span class="col s1"></span>
-              <span class="col s5">
-                <a
-                  class="btn-small outlined waves-effect waves-light"
-                  id="next"
-                  type="button"
-                >
-                  <svg
-                    class="octicon"
-                    xmlns="http://www.w3.org/2000/svg"
-                    enable-background="new 0 0 24 24"
-                    height="13"
-                    viewBox="0 0 24 24"
-                    width="13"
-                  >
-                    <g><path d="M0,0h24v24H0V0z" fill="none" /></g>
-                    <g>
-                      <polygon
-                        points="6.23,20.23 8,22 18,12 8,2 6.23,3.77 14.46,12"
-                      />
-                    </g>
-                  </svg>
-                  <span>next</span>
-                </a>
-              </span>
+      <div class="row">
+        <div id="canvasDiv" class="col s12 l8 left-align section">
+          <canvas id="myCanvas"></canvas>
+        </div>
+        <div class="col s12 l4 section">
+          <div class="card left-align grey lighten-5">
+            <div class="card-content">
+              <span class="card-title">停止/再生</span>
+              <div class="container">
+                <div class="row">
+                  <span class="col s5">
+                    <span class="switch">
+                      <label>
+                        <span>stop</span>
+                        <input id="play" type="checkbox" />
+                        <span class="lever"></span>
+                        <span>play</span>
+                      </label>
+                    </span>
+                  </span>
+                  <span class="col s1"></span>
+                  <span class="col s5">
+                    <a
+                      class="btn-small outlined waves-effect waves-light"
+                      id="next"
+                      type="button"
+                    >
+                      <svg
+                        class="octicon"
+                        xmlns="http://www.w3.org/2000/svg"
+                        enable-background="new 0 0 24 24"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        width="13"
+                      >
+                        <g><path d="M0,0h24v24H0V0z" fill="none" /></g>
+                        <g>
+                          <polygon
+                            points="6.23,20.23 8,22 18,12 8,2 6.23,3.77 14.46,12"
+                          />
+                        </g>
+                      </svg>
+                      <span>next</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+
+              <span class="card-title">速度</span>
+              <p class="range-field left-align">
+                <input
+                  id="speed"
+                  type="range"
+                  name="speed"
+                  min="1"
+                  max="10"
+                  value="5"
+                />
+              </p>
+              <span class="card-title">サイズ</span>
+              <p class="range-field left-align">
+                <span>X軸</span>
+                <input
+                  id="rangex"
+                  type="range"
+                  name="rangex"
+                  min="10"
+                  max="50"
+                  value="50"
+                />
+              </p>
+
+              <p class="range-field left-align">
+                <span>Y軸</span>
+                <input
+                  id="rangey"
+                  type="range"
+                  name="rangey"
+                  min="10"
+                  max="50"
+                  value="50"
+                />
+              </p>
+
+              <span class="card-title">履歴</span>
+              <p class="range-field left-align">
+                <input
+                  id="history"
+                  type="range"
+                  name="rangey"
+                  min="0"
+                  max="0"
+                  value="0"
+                />
+              </p>
             </div>
           </div>
-        </li>
-        <li class="collection-item">
-          <p class="range-field left-align">
-            <span>X</span>
-            <input
-              id="rangex"
-              type="range"
-              name="rangex"
-              min="10"
-              max="50"
-              value="50"
-            />
-          </p>
+        </div>
 
-          <p class="range-field left-align">
-            <span>Y</span>
-            <input
-              id="rangey"
-              type="range"
-              name="rangey"
-              min="10"
-              max="50"
-              value="50"
-            />
-          </p>
-        </li>
-        <li class="collection-item">
-          <p class="range-field left-align">
-            <span>履歴</span>
-            <input
-              id="history"
-              type="range"
-              name="rangey"
-              min="0"
-              max="0"
-              value="0"
-            />
-          </p>
-        </li>
-      </ul>
+        <div id="title" class="col s12 l8 section">
+          <div class="card left-align grey lighten-5">
+            <div class="card-content">
+              <span class="card-title">ルール</span>
+              <div>
+                誕生：死んでいるセルに隣接する生きたセルがちょうど3つあれば、次の世代が誕生する。
+              </div>
+              <div>
+                生存：生きているセルに隣接する生きたセルが2つか3つならば、次の世代でも生存する。
+              </div>
+              <div>
+                過疎：生きているセルに隣接する生きたセルが1つ以下ならば、過疎により死滅する。
+              </div>
+              <div>
+                過密：生きているセルに隣接する生きたセルが4つ以上ならば、過密により死滅する。
+              </div>
+            </div>
+            <div class="card-content">
+              <span class="card-title">ライフゲーム とは</span>
+              <blockquote>
+                <div>
+                  ライフゲーム (Conway's Game of Life[1])
+                  は1970年にイギリスの数学者ジョン・ホートン・コンウェイ (John
+                  Horton Conway) が考案した数理モデルである。
+                </div>
+                <div>
+                  単純なルールから複雑な結果が生成され、パズルやミニスケープの要素を持っている。生命の誕生、進化、淘汰などのプロセスを連想させるパターンも存在し、シミュレーションゲームと分類される場合がある。
+                </div>
+                <div>
+                  生物集団においては、過疎でも過密でも個体の生存に適さないという個体群生態学的な側面を背景に持つ。セル・オートマトンのもっともよく知られた例でもある。
+                </div>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 l4 section">
+          <div class="card left-align grey lighten-5">
+            <div class="card-content">
+              <h5 class="">操作</h5>
+              <span class="card-title">Canvas</span>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>左クリック</th>
+                    <td>
+                      <div>ポインタ上のセル状態を切り替え</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>マウスホイール</th>
+                    <td>画面拡大縮小</td>
+                  </tr>
+                  <tr>
+                    <th>左ドラッグ</th>
+                    <td>画面中心を軸に視点を移動</td>
+                  </tr>
+                  <tr>
+                    <th>右ドラッグ</th>
+                    <td>画角を固定し視点を移動</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card-content">
+              <span class="card-title">Input</span>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>stop/play</th>
+                    <td>
+                      <div>盤面更新の再生/停止</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>NEXT</th>
+                    <td>盤面を一つ進める</td>
+                  </tr>
+                  <tr>
+                    <th>速度</th>
+                    <td>再生速度を変更</td>
+                  </tr>
+                  <tr>
+                    <th>X軸/Y軸</th>
+                    <td>それぞれの座標のサイズを変更</td>
+                  </tr>
+                  <tr>
+                    <th>履歴</th>
+                    <td><div>選択位置まで盤面を戻す</div></td>
+                  </tr>
+                  <tr>
+                    <th></th>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <script type="module" src="./js/tree.js"></script>
     <script type="module" src="./js/main.js"></script>

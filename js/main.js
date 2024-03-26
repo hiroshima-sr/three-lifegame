@@ -2,47 +2,63 @@ import { Three } from "./tree";
 import { Map } from "./life";
 let count = 0;
 let isPlaying = false;
+let playSpeed = 5;
+const speedMax = 10;
+const gearRatio = 2;
 
-const canvas = document.querySelector("#myCanvas");
+const canvas = document.getElementById("myCanvas");
 const map = new Map(50, 50);
 const gridSize = map.getSize();
 
 const three = new Three("#myCanvas");
 three.createGridMap(gridSize.x, gridSize.y);
 
+const titleEle = document.getElementById("title");
 const rangex = document.getElementById("rangex");
 const rangey = document.getElementById("rangey");
+const rangeSpeed = document.getElementById("speed");
 const rangeHistory = document.getElementById("history");
 
 const update = () => {
-  if (count++ % 10 === 0 && isPlaying) {
+  const variableSpeed = (speedMax - playSpeed) * gearRatio + 1;
+  if (count % variableSpeed === 0 && isPlaying) {
     map.next();
     historySet();
   }
   requestAnimationFrame(update);
   three.analyserMeshUpdate(map.board);
-  three.treeUpdate();
+  three.threeUpdate();
+  count++;
 };
 
 const mouseMove = (event) => {
+  const scrollX =
+    document.documentElement.scrollLeft || document.body.scrollLeft;
+  const scrollY = document.documentElement.scrollTop || document.body.scrollTop;
   const element = event.currentTarget;
-  const x = event.clientX - element.offsetLeft;
-  const y = event.clientY - element.offsetTop;
+  const x = event.clientX - element.offsetLeft + scrollX;
+  const y = event.clientY - element.offsetTop + scrollY;
   const width = element.offsetWidth;
   const height = element.offsetHeight;
-
   three.pointerHitObject(x, y, width, height);
 };
 
 const clickObject = () => {
   const raycast = three.getRaycastTarget();
   if (raycast.found) {
-    map.board.forEach((v, i) => {
-      v.forEach((value, j) => {
+    map.board.forEach((column, _) => {
+      column.forEach((value, _) => {
         if (value.id === raycast.id) value.alive = !value.alive;
       });
     });
   }
+};
+
+const rangeSet = () => {
+  const mapSize = map.getSize();
+  console.log(mapSize);
+  rangex.value = mapSize.x;
+  rangey.value = mapSize.y;
 };
 
 const historySet = () => {
@@ -61,23 +77,95 @@ const rangeOnChange = () => {
   const y = parseInt(rangey.value);
   map.resize(x, y);
   three.analyserMeshUpdate(map.board);
-  three.gridResize();
-  three.treeUpdate();
+  three.onGridResize();
+  three.threeUpdate();
   const boardHistorys = map.getBoardHistories();
-  const boardCount = boardHistorys.length;
+  const boardCount = boardHistorys.length - 1;
   rangeHistory.max = boardCount;
   rangeHistory.value = boardCount;
 };
 
+const speedRangeOnChange = () => {
+  const speedValue = parseInt(rangeSpeed.value);
+  playSpeed = speedValue;
+};
+
+/**
+ * canvasをmaterializeでサイズ変更するとレイキャスター位置がずれてしまう。
+ *
+ * materializeにウィンドウサイズでのパディング等制御が無いのでjsでクラスを制御し表示ずれに対応...
+ */
+const setTitleCardPadding = () => {
+  if (window.innerWidth > 992) {
+    titleEle.classList.add("mr-6");
+  } else {
+    titleEle.classList.remove("mr-6");
+  }
+};
 //--イベントリスナー----------------------------
 
 window.addEventListener("DOMContentLoaded", () => {
-  //--動作プレビュー用初期設定
-  map.board[5][7].alive = true;
-  map.board[5][8].alive = true;
-  map.board[5][9].alive = true;
-  map.board[6][7].alive = true;
-  map.board[7][8].alive = true;
+  setPreviewMap();
+  setTitleCardPadding();
+  map.saveBoard();
+  three.analyserMeshUpdate(map.board);
+  three.threeUpdate();
+
+  const elementWidth = document.getElementById("canvasDiv").clientWidth;
+  three.onResize(elementWidth);
+  rangeOnChange();
+  update();
+});
+
+document.querySelector("#play").addEventListener("click", () => {
+  isPlaying = !isPlaying;
+  if (isPlaying) {
+    historySet();
+    rangeSet();
+  }
+});
+
+document.querySelector("#next").addEventListener("click", () => {
+  map.next();
+  historySet();
+});
+
+window.addEventListener("resize", () => {
+  const elementWidth = document.getElementById("canvasDiv").clientWidth;
+  three.onResize(elementWidth);
+
+  setTitleCardPadding();
+});
+
+canvas.addEventListener("mousemove", mouseMove);
+canvas.addEventListener("click", clickObject);
+
+rangex.addEventListener("input", rangeOnChange);
+rangey.addEventListener("input", rangeOnChange);
+rangeSpeed.addEventListener("input", speedRangeOnChange);
+
+rangeHistory.addEventListener("input", () => {
+  isPlaying = false;
+  const checkElement = document.getElementById("play");
+  checkElement.checked = isPlaying;
+  const ad = parseInt(rangeHistory.value);
+  const currentBoard = map.getBoardHistory(ad);
+  map.setBoard(currentBoard);
+  three.analyserMeshUpdate(map.board);
+  three.onGridResize();
+  three.threeUpdate();
+  rangeSet();
+});
+
+/**
+ * 動作プレビュー用の盤面初期設定
+ */
+const setPreviewMap = () => {
+  map.board[45][47].alive = true;
+  map.board[45][48].alive = true;
+  map.board[45][49].alive = true;
+  map.board[46][47].alive = true;
+  map.board[47][48].alive = true;
 
   map.board[20][20].alive = true;
   map.board[20][21].alive = true;
@@ -134,41 +222,4 @@ window.addEventListener("DOMContentLoaded", () => {
   map.board[27][26].alive = true;
   map.board[27][27].alive = true;
   map.board[27][28].alive = true;
-
-  map.saveBoard();
-  three.analyserMeshUpdate(map.board);
-  three.treeUpdate();
-  rangeOnChange();
-
-  //アニメーション開始
-  update();
-});
-
-document.querySelector("#play").addEventListener("click", () => {
-  isPlaying = !isPlaying;
-  if (isPlaying) historySet();
-});
-
-document.querySelector("#next").addEventListener("click", () => {
-  map.next();
-  historySet();
-});
-
-canvas.addEventListener("mousemove", mouseMove);
-canvas.addEventListener("click", clickObject);
-
-rangex.addEventListener("input", rangeOnChange);
-rangey.addEventListener("input", rangeOnChange);
-
-rangeHistory.addEventListener("input", () => {
-  isPlaying = false;
-  const checkElement = document.getElementById("play");
-  checkElement.checked = isPlaying;
-  const ad = parseInt(rangeHistory.value);
-  const currentBoard = map.getBoardHistory(ad);
-  map.setBoard(currentBoard);
-
-  three.analyserMeshUpdate(map.board);
-  three.gridResize();
-  three.treeUpdate();
-});
+};

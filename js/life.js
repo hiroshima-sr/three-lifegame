@@ -22,14 +22,17 @@ export class Map {
   };
 
   setBoard = (board) => {
+    this.x = board[0].length;
+    this.y = board.length;
     this.board = board;
   };
+
   getSize = () => {
     return { x: this.x, y: this.y };
   };
 
   saveBoard = () => {
-    if (this.boardHistory.length > 200) {
+    if (this.boardHistory.length > 300) {
       this.boardHistory.shift();
     }
     this.boardHistory.push(structuredClone(this.board));
@@ -67,28 +70,28 @@ export class Map {
   };
 
   next = () => {
-    const yokoLen = this.board[0].length;
-    const tateLen = this.board.length;
+    const boardWidth = this.board[0].length;
+    const boardHeight = this.board.length;
     const copyBoard = structuredClone(this.board);
-    copyBoard.forEach((v, i) => {
-      v.forEach((value, j) => {
-        let count = 0;
-
-        const ishidari = 0 <= j - 1 ? j - 1 : yokoLen - 1;
-        const isue = 0 <= i - 1 ? i - 1 : tateLen - 1;
-        const ismigi = j + 1 < yokoLen ? j + 1 : 0;
-        const issita = i + 1 < tateLen ? i + 1 : 0;
-        if (copyBoard[isue][ishidari].alive) count++;
-        if (copyBoard[isue][j].alive) count++;
-        if (copyBoard[isue][ismigi].alive) count++;
-        if (copyBoard[i][ishidari].alive) count++;
-        if (copyBoard[i][ismigi].alive) count++;
-        if (copyBoard[issita][ishidari].alive) count++;
-        if (copyBoard[issita][j].alive) count++;
-        if (copyBoard[issita][ismigi].alive) count++;
+    copyBoard.forEach((row, i) => {
+      row.forEach((value, j) => {
+        let aliveCellCount = 0;
+        //ボードの端は逆側とつながる。トーラス状。
+        const leftCell = 0 <= j - 1 ? j - 1 : boardWidth - 1;
+        const upperCell = 0 <= i - 1 ? i - 1 : boardHeight - 1;
+        const rightCell = j + 1 < boardWidth ? j + 1 : 0;
+        const lowerCell = i + 1 < boardHeight ? i + 1 : 0;
+        if (copyBoard[upperCell][leftCell].alive) aliveCellCount++;
+        if (copyBoard[upperCell][j].alive) aliveCellCount++;
+        if (copyBoard[upperCell][rightCell].alive) aliveCellCount++;
+        if (copyBoard[i][leftCell].alive) aliveCellCount++;
+        if (copyBoard[i][rightCell].alive) aliveCellCount++;
+        if (copyBoard[lowerCell][leftCell].alive) aliveCellCount++;
+        if (copyBoard[lowerCell][j].alive) aliveCellCount++;
+        if (copyBoard[lowerCell][rightCell].alive) aliveCellCount++;
         this.board[i][j].alive = value.alive
-          ? 2 <= count && count <= 3
-          : count === 3;
+          ? 2 <= aliveCellCount && aliveCellCount <= 3
+          : aliveCellCount === 3;
       });
     });
 
